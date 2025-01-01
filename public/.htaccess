@@ -1,0 +1,7 @@
+# Enable Rewrite Engine
+RewriteEngine on
+
+# Handel requests for files that do not exist
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^(.*)$ /index.php [NC,L,QSA]

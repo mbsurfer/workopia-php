@@ -1,0 +1,16 @@
+{
+    "name": "mbsurfer/workopia-php",
+    "description": "Job listing application",
+    "authors": [
+        {
+            "name": "Ryan Neldner",
+            "email": "rneldner@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Framework\\": "Framework/",
+            "App\\": "App/"
+        }
+    }
+}
