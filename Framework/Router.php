@@ -2,8 +2,11 @@
 
 namespace Framework;
 
+use App\Controllers\ErrorController;
+
 class Router
 {
+    private const URI_PARAM_PATTERN = '/\{(.+?)\}/';
     protected $routes = [];
 
     // todo: maybe this should be private??
@@ -66,13 +69,6 @@ class Router
         $this->registerRoute('DELETE', $uri, $controller);
     }
 
-    public function error($httpCode = 404)
-    {
-        http_response_code($httpCode);
-        loadView("error/{$httpCode}");
-        exit;
-    }
-
     /**
      * Match the request to the route defined by $this->routes.
      * If no match is found, show 404.
@@ -81,18 +77,58 @@ class Router
      * @param string $method
      * @return void
      */
-    public function route($uri, $method)
+    public function route($uri = '')
     {
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+
+        // Split this current URI into segments
+        $uriSegments = explode('/', trim($uri, '/'));
+
         foreach ($this->routes as $route) {
-            if ($route['uri'] === $uri && $route['method'] === $method) {
+
+            // Split the route URI into segments
+            $routeSegments = explode('/', trim($route['uri'], '/'));
+
+            $match = true;
+
+            // If the number of segments in the URI and the route don't match, skip this route
+            if (count($uriSegments) !== count($routeSegments)) {
+                $match = false;
+                continue;
+            }
+
+            // If the request method doesn't match, skip this route
+            if (strtoupper($route['method']) !== $requestMethod) {
+                $match = false;
+                continue;
+            }
+
+            $params = [];
+
+            for ($i = 0; $i < count($uriSegments); $i++) {
+
+                // Break if the segments do not match and there is no {} param
+                if ($routeSegments[$i] !== $uriSegments[$i] && !preg_match(self::URI_PARAM_PATTERN, $routeSegments[$i], $paramMatches)) {
+                    $match = false;
+                    break;
+                }
+
+                // If the router is using params, set the value
+                if ($paramMatches ?? false) {
+                    $params[$paramMatches[1]] = $uriSegments[$i];
+                }
+            }
+
+            if ($match) {
                 $controller = 'App\\Controllers\\' . $route['controller'];
                 $controllerMethod = $route['controllerMethod'];
 
                 // For example, (new ListingController())->index()
-                (new $controller())->$controllerMethod();
+                (new $controller())->$controllerMethod($params);
                 return;
             }
         }
-        $this->error();
+
+        ErrorController::notFound();
     }
 }

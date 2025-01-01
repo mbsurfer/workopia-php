@@ -28,22 +28,24 @@ class ListingController
         loadView('listings/create');
     }
 
-    public function show()
+    public function show($params)
     {
-        $listing_id = $_GET['id'] ?? '';
+        $listing_id = $params['id'] ?? '';
 
         if (!$listing_id) {
-            // todo: render 404
+            ErrorController::notFound('Listing not found.');
+            return;
         }
 
-        $params = [
+        $queryParams = [
             'id' => $listing_id
         ];
 
-        $listing = $this->db->query('SELECT * FROM listings WHERE id = :id', $params)->fetch();
+        $listing = $this->db->query('SELECT * FROM listings WHERE id = :id', $queryParams)->fetch();
 
         if (!$listing) {
-            // todo: render 404
+            ErrorController::notFound('Listing not found.');
+            return;
         }
 
         loadView('listings/show', [
