@@ -35,18 +35,14 @@ class ListingController extends Controller
 
     public function show($params)
     {
-        $listing_id = $params['id'] ?? '';
+        $listingId = $params['id'] ?? '';
 
-        if (!$listing_id) {
+        if (!$listingId) {
             ErrorController::notFound('Listing not found.');
             return;
         }
 
-        $queryParams = [
-            'id' => $listing_id
-        ];
-
-        $listing = $this->db->query('SELECT * FROM listings WHERE id = :id', $queryParams)->fetch();
+        $listing = $this->fetchByID('listinngs', $listingId);
 
         if (!$listing) {
             ErrorController::notFound('Listing not found.');
@@ -82,17 +78,7 @@ class ListingController extends Controller
                 'listing' => $newListingData
             ]);
         } else {
-            // Prepare insert query
-            $fieldsString = implode(', ', array_keys($newListingData));
-            $valuesString = ':' . implode(', :', array_keys($newListingData));
-            $sql = "INSERT INTO listings ($fieldsString) VALUES ($valuesString)";
-
-            // Replace empty strings with null
-            $sanitizedData = array_map(fn($value) => $value === '' ? null : $value, $newListingData);
-
-            // Execute insert query
-            $this->db->query($sql, $sanitizedData);
-
+            $this->createRecord('listings', $newListingData);
             redirect('/listings');
         }
     }
@@ -127,18 +113,14 @@ class ListingController extends Controller
 
     public function edit($params)
     {
-        $listing_id = $params['id'] ?? '';
+        $listingId = $params['id'] ?? '';
 
-        if (!$listing_id) {
+        if (!$listingId) {
             ErrorController::notFound('Listing not found.');
             return;
         }
 
-        $queryParams = [
-            'id' => $listing_id
-        ];
-
-        $listing = $this->db->query('SELECT * FROM listings WHERE id = :id', $queryParams)->fetch();
+        $listing = $this->fetchByID('listinngs', $listingId);
 
         if (!$listing) {
             ErrorController::notFound('Listing not found.');
@@ -152,18 +134,14 @@ class ListingController extends Controller
 
     public function update($params = [])
     {
-        $listing_id = $params['id'] ?? '';
+        $listingId = $params['id'] ?? '';
 
-        if (!$listing_id) {
+        if (!$listingId) {
             ErrorController::notFound('Listing not found.');
             return;
         }
 
-        $queryParams = [
-            'id' => $listing_id
-        ];
-
-        $listing = $this->db->query('SELECT * FROM listings WHERE id = :id', $queryParams)->fetch();
+        $listing = $this->fetchByID('listinngs', $listingId);
 
         if (!$listing) {
             ErrorController::notFound('Listing not found.');
@@ -172,7 +150,7 @@ class ListingController extends Controller
 
         $updateListingData = array_intersect_key($_POST, array_flip($this->allowedFields));
         $updateListingData = array_map('sanitize', $updateListingData);
-        $updateListingData['id'] = $listing_id;
+        $updateListingData['id'] = $listingId;
 
         $errors = [];
 
@@ -203,7 +181,7 @@ class ListingController extends Controller
             // set flash message
             $_SESSION['success_message'] = 'Listing updated successfully';
 
-            redirect('/listings/' . $listing_id);
+            redirect('/listings/' . $listingId);
         }
     }
 }

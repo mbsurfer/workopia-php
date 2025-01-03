@@ -79,7 +79,7 @@ class Router
      */
     public function route($uri = '')
     {
-        $requestMethod = $this->getRequestMethod();
+        $requestMethod = self::getRequestMethod();
 
         // Split this current URI into segments
         $uriSegments = explode('/', trim($uri, '/'));
@@ -137,7 +137,7 @@ class Router
      *
      * @return string
      */
-    private function getRequestMethod()
+    public static function getRequestMethod()
     {
         $requestMethod = $_SERVER['REQUEST_METHOD'];
 
