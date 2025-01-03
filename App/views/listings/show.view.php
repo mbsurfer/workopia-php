@@ -3,6 +3,9 @@
 <?php loadPartial('top-banner'); ?>
 
 <section class="container mx-auto p-4 mt-4">
+
+    <?php loadPartial('message') ?>
+
     <div class="rounded-lg shadow-md bg-white p-3">
         <div class="flex justify-between items-center">
             <a class="block p-4 text-blue-700" href="/listings">
@@ -10,7 +13,7 @@
                 Back To Listings
             </a>
             <div class="flex space-x-4 ml-4">
-                <a href="/edit?id=<?= $listing->id ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Edit</a>
+                <a href="/listings/edit/<?= $listing->id ?>" class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded">Edit</a>
                 <!-- Delete Form -->
                 <form method="POST" action="/listings/<?= $listing->id ?>">
                     <input type="hidden" name="_method" value="DELETE">
