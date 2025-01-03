@@ -2,17 +2,17 @@
 
 namespace App\Controllers;
 
-use Framework\Database;
+use Framework\Controller;
 use Framework\Validation;
 
-class ListingController
+class ListingController extends Controller
 {
-    protected $db;
+    private $allowedFields = ['title', 'description', 'salary', 'city', 'state', 'tags', 'company', 'email', 'phone', 'requirements', 'benefits'];
+    private $requiredFields = ['title', 'description', 'salary', 'city', 'state', 'email'];
 
     public function __construct()
     {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
+        parent::__construct();
     }
 
     public function index()
@@ -26,7 +26,11 @@ class ListingController
 
     public function create()
     {
-        loadView('listings/create');
+        $listing = array_intersect_key($_POST, array_flip($this->allowedFields));
+
+        loadView('listings/create', [
+            'listing' => $listing
+        ]);
     }
 
     public function show($params)
@@ -56,19 +60,16 @@ class ListingController
 
     public function store()
     {
-        $allowedFields = ['title', 'description', 'salary', 'city', 'state', 'tags', 'company', 'email', 'phone', 'requirements', 'benefits'];
-
-        $newListingData = array_intersect_key($_POST, array_flip($allowedFields));
+        $newListingData = array_intersect_key($_POST, array_flip($this->allowedFields));
 
         // todo: replace id with logged in user id
         $newListingData['user_id'] = 1;
 
         $newListingData = array_map('sanitize', $newListingData);
 
-        $requiredFields = ['title', 'description', 'salary', 'city', 'state', 'email'];
         $errors = [];
 
-        foreach ($requiredFields as $field) {
+        foreach ($this->requiredFields as $field) {
             if (empty($newListingData[$field]) || !Validation::string($newListingData[$field])) {
                 $errors[$field] = ucfirst($field . ' is required');
             }
@@ -169,16 +170,13 @@ class ListingController
             return;
         }
 
-        $allowedFields = ['title', 'description', 'salary', 'address', 'city', 'state', 'tags', 'company', 'email', 'phone', 'requirements', 'benefits'];
-
-        $updateListingData = array_intersect_key($_POST, array_flip($allowedFields));
+        $updateListingData = array_intersect_key($_POST, array_flip($this->allowedFields));
         $updateListingData = array_map('sanitize', $updateListingData);
         $updateListingData['id'] = $listing_id;
 
-        $requiredFields = ['title', 'description', 'salary', 'city', 'state', 'email'];
         $errors = [];
 
-        foreach ($requiredFields as $field) {
+        foreach ($this->requiredFields as $field) {
             if (empty($updateListingData[$field]) || !Validation::string($updateListingData[$field])) {
                 $errors[$field] = ucfirst($field . ' is required');
             }

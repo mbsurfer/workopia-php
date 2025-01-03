@@ -103,3 +103,13 @@ function redirect($uri = '')
     header("Location: {$uri}");
     exit();
 }
+
+/**
+ * Get the refering page
+ *
+ * @return string
+ */
+function referer()
+{
+    return $_SERVER['HTTP_REFERER'] ?? '/';
+}

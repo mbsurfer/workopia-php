@@ -2,16 +2,14 @@
 
 namespace App\Controllers;
 
-use Framework\Database;
+use Framework\Controller;
 
-class HomeController
+class HomeController extends Controller
 {
-    protected $db;
 
     public function __construct()
     {
-        $config = require basePath('config/db.php');
-        $this->db = new Database($config);
+        parent::__construct();
     }
 
     public function index()
