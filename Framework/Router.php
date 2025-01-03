@@ -79,7 +79,7 @@ class Router
      */
     public function route($uri = '')
     {
-        $requestMethod = $_SERVER['REQUEST_METHOD'];
+        $requestMethod = $this->getRequestMethod();
 
         // Split this current URI into segments
         $uriSegments = explode('/', trim($uri, '/'));
@@ -130,5 +130,22 @@ class Router
         }
 
         ErrorController::notFound();
+    }
+
+    /**
+     * Get the request method and check for a method override
+     *
+     * @return string
+     */
+    private function getRequestMethod()
+    {
+        $requestMethod = $_SERVER['REQUEST_METHOD'];
+
+        // Check if the request method is being overridden, commonly used for DELETE and PUT requests
+        if ($requestMethod === 'POST' && isset($_POST['_method'])) {
+            $requestMethod = strtoupper($_POST['_method']);
+        }
+
+        return $requestMethod;
     }
 }
