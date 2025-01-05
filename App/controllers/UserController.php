@@ -5,7 +5,6 @@ namespace App\Controllers;
 use Framework\Controller;
 use Framework\Validation;
 use Framework\Session;
-use Framework\Router;
 
 class UserController extends Controller
 {
