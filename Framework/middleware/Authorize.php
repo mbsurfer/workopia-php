@@ -7,17 +7,31 @@ use Framework\Session;
 class Authorize
 {
 
+    /**
+     * Check if user is authenticated
+     *
+     * @return boolean
+     */
     public function isAuthenticated()
     {
         return Session::has('user');
     }
 
+    /**
+     * Handle the user's request
+     *
+     * @param string $role
+     * @return void
+     */
     public function handle($role = '')
     {
+        // Redirect authenticated users to homepage if they vistis the route (ie. /login)
         if ($role === 'guest' && $this->isAuthenticated()) {
-            redirect('/');
-        } else if ($role === 'auth' && !$this->isAuthenticated()) {
-            redirect('/auth/login');
+            return redirect('/');
+        }
+        // Redirct unauthenticated visitors away from the route (ie. /listings/create)
+        else if ($role === 'auth' && !$this->isAuthenticated()) {
+            return redirect('/auth/login');
         }
     }
 }

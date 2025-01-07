@@ -11,14 +11,24 @@ class Router
     protected $routes = [];
 
     // todo: maybe this should be private??
-    public function registerRoute($method, $uri, $action)
+    /**
+     * Add a new route to the $this->routes array
+     *
+     * @param string $method
+     * @param string $uri
+     * @param string $action
+     * @param array $middeleware
+     * @return void
+     */
+    public function registerRoute($method, $uri, $action, $middeleware = [])
     {
         list($controller, $controllerMethod) = explode('@', $action);
         $this->routes[] = [
             'method' => $method,
             'uri' => $uri,
             'controller' => $controller,
-            'controllerMethod' =>  $controllerMethod
+            'controllerMethod' =>  $controllerMethod,
+            'middleware' => $middeleware
         ];
     }
 
@@ -27,11 +37,12 @@ class Router
      *
      * @param string $uri
      * @param string $controller
+     * @param array $middeleware
      * @return void
      */
-    public function get($uri, $controller)
+    public function get($uri, $controller, $middeleware = [])
     {
-        $this->registerRoute('GET', $uri, $controller);
+        $this->registerRoute('GET', $uri, $controller, $middeleware);
     }
 
     /**
@@ -39,11 +50,12 @@ class Router
      *
      * @param string $uri
      * @param string $controller
+     * @param array $middeleware
      * @return void
      */
-    public function post($uri, $controller)
+    public function post($uri, $controller, $middeleware = [])
     {
-        $this->registerRoute('POST', $uri, $controller);
+        $this->registerRoute('POST', $uri, $controller, $middeleware);
     }
 
     /**
@@ -51,11 +63,12 @@ class Router
      *
      * @param string $uri
      * @param string $controller
+     * @param array $middeleware
      * @return void
      */
-    public function put($uri, $controller)
+    public function put($uri, $controller, $middeleware = [])
     {
-        $this->registerRoute('PUT', $uri, $controller);
+        $this->registerRoute('PUT', $uri, $controller, $middeleware);
     }
 
     /**
@@ -63,11 +76,12 @@ class Router
      *
      * @param string $uri
      * @param string $controller
+     * @param array $middeleware
      * @return void
      */
-    public function delete($uri, $controller)
+    public function delete($uri, $controller, $middeleware = [])
     {
-        $this->registerRoute('DELETE', $uri, $controller);
+        $this->registerRoute('DELETE', $uri, $controller, $middeleware);
     }
 
     /**
@@ -121,6 +135,12 @@ class Router
             }
 
             if ($match) {
+
+                // Check if the route has a role(s) associated with it
+                foreach ($route['middleware'] as $role) {
+                    (new Authorize())->handle($role);
+                }
+
                 $controller = 'App\\Controllers\\' . $route['controller'];
                 $controllerMethod = $route['controllerMethod'];
 
