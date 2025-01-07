@@ -25,7 +25,8 @@ class Authorize
      */
     public function handle($role = '')
     {
-        // Redirect authenticated users to homepage if they vistis the route (ie. /login)
+        // Redirect authenticated users to homepage if they vistit the route (ie. /login)
+        // Routes associated for the guest role are only allowed for users who are not logged in
         if ($role === 'guest' && $this->isAuthenticated()) {
             return redirect('/');
         }

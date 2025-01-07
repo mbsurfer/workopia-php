@@ -5,7 +5,24 @@
 <!-- Job Listings -->
 <section>
     <div class="container mx-auto p-4 mt-4">
-        <div class="text-center text-3xl mb-4 font-bold border border-gray-300 p-3">All Jobs</div>
+        <div class="text-center text-3xl mb-4 font-bold border border-gray-300 p-3">
+            <?= $title ?? 'All Jobs' ?>
+        </div>
+
+        <?php if (isset($searchTerms)): ?>
+            <div class="text-center text-lg mb-4 flex justify-center items-center space-x-4">
+                <?php if (!empty($searchTerms['keywords'])): ?>
+                    <div>
+                        Keywords: <strong><?= $searchTerms['keywords'] ?></strong>
+                    </div>
+                <?php endif; ?>
+                <?php if (!empty($searchTerms['location'])): ?>
+                    <div>
+                        Location: <strong><?= $searchTerms['location'] ?></strong>
+                    </div>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
 
         <?php loadPartial('message') ?>
 
@@ -30,7 +47,7 @@
                                 </li>
                             <?php endif; ?>
                         </ul>
-                        <a href="listings/<?= $listing->id ?>"
+                        <a href="/listings/<?= $listing->id ?>"
                             class="block w-full text-center px-5 py-2.5 shadow-sm rounded border text-base font-medium text-indigo-700 bg-indigo-100 hover:bg-indigo-200">
                             Details
                         </a>

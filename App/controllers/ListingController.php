@@ -52,7 +52,8 @@ class ListingController extends Controller
         }
 
         loadView('listings/show', [
-            'listing' => $listing
+            'listing' => $listing,
+            'isOwner' => Authorization::isOwner($listing->user_id)
         ]);
     }
 
@@ -199,5 +200,29 @@ class ListingController extends Controller
 
             redirect('/listings/' . $listingId);
         }
+    }
+
+    public function search()
+    {
+        $keywords = trim($_GET['keywords']) ?? '';
+        $location = trim($_GET['location']) ?? '';
+
+        $query = "SELECT * FROM listings WHERE (title LIKE :keywords OR 
+        description LIKE :keywords OR tags LIKE :keywords) AND (city LIKE :location 
+        OR state LIKE :location)";
+
+        $listings = $this->db->query($query, [
+            'keywords' => "%$keywords%",
+            'location' => "%$location%"
+        ])->fetchAll();
+
+        loadView('listings/index', [
+            'listings' => $listings,
+            'title' => 'Search Results',
+            'searchTerms' => [
+                'keywords' => htmlspecialchars($keywords),
+                'location' => htmlspecialchars($location)
+            ]
+        ]);
     }
 }
